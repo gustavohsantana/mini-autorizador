@@ -24,7 +24,7 @@ import java.util.List;
 class TransacaoServiceTest {
 
     @Autowired
-    private TransacaoService transacaoService; // Serviço será injetado pelo Spring
+    private TransacaoService transacaoService;
 
     @MockBean
     private CartaoRepository cartaoRepository;
@@ -39,27 +39,19 @@ class TransacaoServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        cartao = new Cartao();
-        cartao.setNumeroCartao("123456789");
-        cartao.setSenha("1234");
-        cartao.setSaldo(new BigDecimal("1000.00"));
+        cartao = new Cartao("123456789", "1234", new BigDecimal("1000.00"));
+        transacaoRequest = new TransacaoRequest("123456789", "1234", "500.00");
 
-        // Inicializa o mock do CartaoRepository
         when(cartaoRepository.findById(cartao.getNumeroCartao())).thenReturn(java.util.Optional.of(cartao));
-
-        transacaoRequest = new TransacaoRequest();
-        transacaoRequest.setNumeroCartao("123456789");
-        transacaoRequest.setSenhaCartao("1234");
-        transacaoRequest.setValor("500.00");
     }
 
     @Test
     void deveRealizarTransacaoComSucesso() {
         transacaoService.realizarTransacao(transacaoRequest);
 
-        assertTrue(cartao.getSaldo().compareTo(new BigDecimal("500.00")) == 0);
-
+        assertEquals(new BigDecimal("500.00"), cartao.getSaldo());
         verify(cartaoRepository).save(cartao);
+        validators.forEach(validator -> verify(validator).validate(transacaoRequest, cartao));
     }
 
     @Test
@@ -71,6 +63,7 @@ class TransacaoServiceTest {
         });
 
         assertEquals("Cartão não encontrado", exception.getMessage());
+        validators.forEach(validator -> verify(validator).validate(transacaoRequest, cartao));
     }
 
     @Test
@@ -82,6 +75,7 @@ class TransacaoServiceTest {
         });
 
         assertEquals("Senha inválida", exception.getMessage());
+        validators.forEach(validator -> verify(validator).validate(transacaoRequest, cartao));
     }
 
     @Test
@@ -93,5 +87,6 @@ class TransacaoServiceTest {
         });
 
         assertEquals("Saldo insuficiente", exception.getMessage());
+        validators.forEach(validator -> verify(validator).validate(transacaoRequest, cartao));
     }
 }
