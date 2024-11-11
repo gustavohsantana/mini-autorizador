@@ -47,11 +47,7 @@ public class CartaoController {
     public ResponseEntity<String> realizarTransacao(@RequestBody TransacaoRequest transacaoRequest) {
         try {
             // Chama o serviço para realizar a transação
-            transacaoService.realizarTransacao(
-                    transacaoRequest.getNumeroCartao(),
-                    transacaoRequest.getSenhaCartao(),
-                    transacaoRequest.getValor()
-            );
+            transacaoService.realizarTransacao(transacaoRequest);
             // Retorna uma resposta de sucesso com status HTTP 200 OK
             return ResponseEntity.ok("Transação realizada com sucesso!");
         } catch (CartaoNaoEncontradoException e) {

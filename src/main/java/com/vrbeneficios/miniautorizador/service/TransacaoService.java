@@ -1,15 +1,18 @@
 package com.vrbeneficios.miniautorizador.service;
 
+import com.vrbeneficios.miniautorizador.dto.TransacaoRequest;
 import com.vrbeneficios.miniautorizador.exceptions.CartaoNaoEncontradoException;
 import com.vrbeneficios.miniautorizador.exceptions.SaldoInsuficienteException;
 import com.vrbeneficios.miniautorizador.exceptions.SenhaInvalidaException;
 import com.vrbeneficios.miniautorizador.model.Cartao;
 import com.vrbeneficios.miniautorizador.repository.CartaoRepository;
+import com.vrbeneficios.miniautorizador.validator.Validator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class TransacaoService {
@@ -17,26 +20,22 @@ public class TransacaoService {
     @Autowired
     private CartaoRepository cartaoRepository;
 
-    @Transactional
-    public void realizarTransacao(String numeroCartao, String senhaCartao, String valor) {
+    @Autowired
+    private List<Validator> validators;
 
-        Cartao cartao = cartaoRepository.findById(numeroCartao)
+    @Transactional
+    public void realizarTransacao(TransacaoRequest transacaoRequest) {
+
+        Cartao cartao = cartaoRepository.findById(transacaoRequest.getNumeroCartao())
                 .orElseThrow(() -> new CartaoNaoEncontradoException("Cartão não encontrado"));
 
-        if (!cartao.getSenha().equals(senhaCartao)) {
-            throw new SenhaInvalidaException("Senha inválida");
-        }
+        // Executa cada validação na cadeia
+        validators.stream()
+                .forEach(validator -> validator.validate(transacaoRequest, cartao));
 
-        BigDecimal saldoBigDecimal = cartao.getSaldo();
-
-        BigDecimal valorTransacao = new BigDecimal(valor);
-
-        if (saldoBigDecimal.compareTo(valorTransacao) < 0) {
-            throw new SaldoInsuficienteException("Saldo insuficiente");
-        }
-
-        BigDecimal novoSaldo = saldoBigDecimal.subtract(valorTransacao);
-
+        // Realiza a transação
+        BigDecimal valorTransacao = new BigDecimal(transacaoRequest.getValor());
+        BigDecimal novoSaldo = cartao.getSaldo().subtract(valorTransacao);
         cartao.setSaldo(novoSaldo);
 
         cartaoRepository.save(cartao);

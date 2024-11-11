@@ -1,115 +1,97 @@
 package com.vrbeneficios.miniautorizador.service;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.vrbeneficios.miniautorizador.dto.TransacaoRequest;
 import com.vrbeneficios.miniautorizador.exceptions.CartaoNaoEncontradoException;
 import com.vrbeneficios.miniautorizador.exceptions.SaldoInsuficienteException;
 import com.vrbeneficios.miniautorizador.exceptions.SenhaInvalidaException;
 import com.vrbeneficios.miniautorizador.model.Cartao;
 import com.vrbeneficios.miniautorizador.repository.CartaoRepository;
+import com.vrbeneficios.miniautorizador.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+@SpringBootTest
+class TransacaoServiceTest {
 
-public class TransacaoServiceTest {
+    @Autowired
+    private TransacaoService transacaoService; // Serviço será injetado pelo Spring
 
-    @Mock
+    @MockBean
     private CartaoRepository cartaoRepository;
 
-    @InjectMocks
-    private TransacaoService transacaoService;
+    @MockBean
+    private List<Validator> validators;
+
+    private TransacaoRequest transacaoRequest;
+    private Cartao cartao;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        cartao = new Cartao();
+        cartao.setNumeroCartao("123456789");
+        cartao.setSenha("1234");
+        cartao.setSaldo(new BigDecimal("1000.00"));
+
+        // Inicializa o mock do CartaoRepository
+        when(cartaoRepository.findById(cartao.getNumeroCartao())).thenReturn(java.util.Optional.of(cartao));
+
+        transacaoRequest = new TransacaoRequest();
+        transacaoRequest.setNumeroCartao("123456789");
+        transacaoRequest.setSenhaCartao("1234");
+        transacaoRequest.setValor("500.00");
     }
 
     @Test
-    public void lancarExcecaoQuandoCartaoNaoForEncontrado() {
-        // Configuração
-        String numeroCartao = "1234567890123456";
-        String senhaCartao = "1234";
-        String valor = "50.00";
+    void deveRealizarTransacaoComSucesso() {
+        transacaoService.realizarTransacao(transacaoRequest);
 
-        when(cartaoRepository.findById(numeroCartao)).thenReturn(Optional.empty());
+        assertTrue(cartao.getSaldo().compareTo(new BigDecimal("500.00")) == 0);
 
-        // Execução e verificação
-        assertThrows(CartaoNaoEncontradoException.class, () ->
-                transacaoService.realizarTransacao(numeroCartao, senhaCartao, valor)
-        );
-
-        verify(cartaoRepository, times(1)).findById(numeroCartao);
+        verify(cartaoRepository).save(cartao);
     }
 
     @Test
-    public void lancarExcecaoQuandoSenhaForInvalida() {
-        // Configuração
-        String numeroCartao = "1234567890123456";
-        String senhaCartao = "1234";
-        String valor = "50.00";
+    void deveLancarExcecaoQuandoCartaoNaoEncontrado() {
+        when(cartaoRepository.findById(cartao.getNumeroCartao())).thenReturn(java.util.Optional.empty());
 
-        Cartao cartao = new Cartao();
-        cartao.setNumeroCartao(numeroCartao);
-        cartao.setSenha("0000"); // senha incorreta
-        cartao.setSaldo(BigDecimal.valueOf(100.00));
+        CartaoNaoEncontradoException exception = assertThrows(CartaoNaoEncontradoException.class, () -> {
+            transacaoService.realizarTransacao(transacaoRequest);
+        });
 
-        when(cartaoRepository.findById(numeroCartao)).thenReturn(Optional.of(cartao));
-
-        // Execução e verificação
-        assertThrows(SenhaInvalidaException.class, () ->
-                transacaoService.realizarTransacao(numeroCartao, senhaCartao, valor)
-        );
-
-        verify(cartaoRepository, times(1)).findById(numeroCartao);
+        assertEquals("Cartão não encontrado", exception.getMessage());
     }
 
     @Test
-    public void lancarExcecaoQuandoSaldoForInsuficiente() {
-        // Configuração
-        String numeroCartao = "1234567890123456";
-        String senhaCartao = "1234";
-        String valor = "150.00"; // valor maior que o saldo
+    void deveLancarExcecaoQuandoSenhaInvalida() {
+        transacaoRequest.setSenhaCartao("incorrect");
 
-        Cartao cartao = new Cartao();
-        cartao.setNumeroCartao(numeroCartao);
-        cartao.setSenha(senhaCartao);
-        cartao.setSaldo(BigDecimal.valueOf(100.00));
+        SenhaInvalidaException exception = assertThrows(SenhaInvalidaException.class, () -> {
+            transacaoService.realizarTransacao(transacaoRequest);
+        });
 
-        when(cartaoRepository.findById(numeroCartao)).thenReturn(Optional.of(cartao));
-
-        // Execução e verificação
-        assertThrows(SaldoInsuficienteException.class, () ->
-                transacaoService.realizarTransacao(numeroCartao, senhaCartao, valor)
-        );
-
-        verify(cartaoRepository, times(1)).findById(numeroCartao);
+        assertEquals("Senha inválida", exception.getMessage());
     }
 
     @Test
-    public void realizarTransacaoComSucesso() {
-        // Configuração
-        String numeroCartao = "1234567890123456";
-        String senhaCartao = "1234";
-        String valor = "50.00"; // valor dentro do saldo disponível
+    void deveLancarExcecaoQuandoSaldoInsuficiente() {
+        transacaoRequest.setValor("1500.00");
 
-        Cartao cartao = new Cartao();
-        cartao.setNumeroCartao(numeroCartao);
-        cartao.setSenha(senhaCartao);
-        cartao.setSaldo(BigDecimal.valueOf(100.00));
+        SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class, () -> {
+            transacaoService.realizarTransacao(transacaoRequest);
+        });
 
-        when(cartaoRepository.findById(numeroCartao)).thenReturn(Optional.of(cartao));
-
-        // Execução
-        transacaoService.realizarTransacao(numeroCartao, senhaCartao, valor);
-
-        // Verificação
-        assertEquals(50.00, cartao.getSaldo()); // saldo após transação
-        verify(cartaoRepository, times(1)).save(cartao);
+        assertEquals("Saldo insuficiente", exception.getMessage());
     }
 }
