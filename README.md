@@ -13,6 +13,26 @@ Este projeto é uma API que simula a funcionalidade de um sistema de autorizaç�
 - **MySQL** (para armazenamento de dados)
 - **Docker** (para containerização do MySQL)
 
+## Instalação e Configuração
+
+Para configurar e executar o projeto, siga os passos abaixo:
+
+1. **Clone o repositório**:
+```bash
+git clone https://github.com/gustavohsantana/mini-autorizador.git
+cd mini-autorizador
+```
+
+2. **Inicie o container do MySQL**:
+```bash
+docker-compose up -d
+```
+
+3. **Execute o projeto**:
+```bash
+./mvnw spring-boot:run
+```
+
 ## Endpoints da API
 
 ### 1. **Criar Cartão**
@@ -113,26 +133,25 @@ Este projeto é uma API que simula a funcionalidade de um sistema de autorizaç�
 ---
 
 ## Validação de Segurança
+A aplicação utiliza Spring Security para proteger os endpoints, garantindo que apenas usuários autenticados possam realizar transações. A autenticação é feita por meio de Basic Auth.
 
-A aplicação utiliza **Spring Security** para proteger os endpoints, garantindo que apenas usuários autenticados possam realizar transações. A autenticação é feita por meio de **JWT (JSON Web Token)**.
+### Proteção dos Endpoints
+* Authentication Method: Basic Auth
+* Username: `username` 
+* Password: `password`
+* 
+Para validar a segurança, as credenciais de autenticação devem ser enviadas no cabeçalho da requisição conforme mostrado abaixo:
 
-### Endpoint Protegido: **Realizar Transação**
-- **Método de Autenticação**: JWT (JSON Web Token)
+## Request Header:
+Authorization: Basic <base64-encoded-credentials>
 
-Para validar a segurança, o token JWT deve ser enviado no cabeçalho da requisição, como mostrado abaixo:
-
-#### Cabeçalho da Requisição:
-```bash
-Authorization: Bearer <seu-token-aqui>
-```
-
-#### Resposta para Acesso Negado (Token inválido ou ausente):
-- **Código de Status**: 401 (Unauthorized)
-- **Mensagem**:
+Response for Access Denied (Invalid or Missing Credentials):
+- **Status Code**: 401 (Unauthorized)
+- **Message**:
 ```json
 {
-    "error": "Token de autenticação inválido ou ausente."
-}
+  "error": "Unauthorized."
+} 
 ```
 
 #### Print da Validação de Segurança:
@@ -178,13 +197,3 @@ A API possui as seguintes exceções mapeadas:
     "error": "Erro interno do servidor"
 }
 ```
-
-## Conclusão
-
-Essa API é um exemplo simples de como criar um sistema de autorização de transações com cartões, utilizando tecnologias como **Java 17**, **Spring Boot**, **Hibernate**, **Spring Data JPA** e **Spring Security**. Os endpoints estão protegidos por segurança e possuem validações robustas, garantindo que apenas usuários autorizados possam realizar transações.
-
-Por favor, consulte os prints das saídas de cada requisição e as validações de segurança para garantir que a aplicação esteja funcionando conforme o esperado.
-
----
-
-**Observação**: Certifique-se de adicionar as capturas de tela conforme os exemplos acima, para demonstrar as respostas e a segurança da aplicação.
