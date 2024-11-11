@@ -22,4 +22,12 @@ public class CartaoServiceTest {
         assertEquals(cartao.getNumeroCartao(), novoCartao.getNumeroCartao());
     }
 
+    @Test
+    public void testObterSaldoCartao() {
+        Cartao cartao = new Cartao("123456789012", "senha123", 1000.0);
+        Double saldoCartao = cartaoService.obterSaldo(cartao.getNumeroCartao());
+        assertNotNull(saldoCartao);
+        assertEquals(cartao.getSaldo(), saldoCartao);
+    }
+
 }
