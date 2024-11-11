@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/cartoes")
@@ -24,7 +25,7 @@ public class CartaoController {
     @Autowired
     private TransacaoService transacaoService;
 
-    @PostMapping
+    @PostMapping("/criar")
     public ResponseEntity<Cartao> criarCartao(@RequestBody Cartao cartao) {
         if (cartaoService.obterSaldo(cartao.getNumeroCartao()) != null) {
             return ResponseEntity.badRequest().body(null);
@@ -33,37 +34,35 @@ public class CartaoController {
         return new ResponseEntity<>(novoCartao, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{numeroCartao}")
-    public ResponseEntity<BigDecimal> obterCartao(@PathVariable String numeroCartao) {
+    @GetMapping("/{numeroCartao}/saldo")
+    public ResponseEntity<BigDecimal> obterSaldoCartao(@PathVariable String numeroCartao) {
         BigDecimal saldo = cartaoService.obterSaldo(numeroCartao);
         if (saldo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(saldo, HttpStatus.OK);
+    }
 
+    @GetMapping("/listar")
+    public ResponseEntity<List<Cartao>> listarTodosCartoes() {
+        List<Cartao> cartoes = cartaoService.getAllCartoes();
+        return new ResponseEntity<>(cartoes, HttpStatus.OK);
     }
 
     @PostMapping("/transacao")
     public ResponseEntity<String> realizarTransacao(@RequestBody TransacaoRequest transacaoRequest) {
         try {
-            // Chama o serviço para realizar a transação
             transacaoService.realizarTransacao(transacaoRequest);
-            // Retorna uma resposta de sucesso com status HTTP 200 OK
             return ResponseEntity.ok("Transação realizada com sucesso!");
         } catch (CartaoNaoEncontradoException e) {
-            // Em caso de cartão não encontrado, retorna 404 NOT FOUND
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cartão não encontrado");
         } catch (SenhaInvalidaException e) {
-            // Em caso de senha inválida, retorna 400 BAD REQUEST
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha inválida");
         } catch (SaldoInsuficienteException e) {
-            // Em caso de saldo insuficiente, retorna 400 BAD REQUEST
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Saldo insuficiente");
         } catch (Exception e) {
-            // Em caso de erro inesperado, retorna 500 INTERNAL SERVER ERROR
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno do servidor");
         }
-
     }
 
 }

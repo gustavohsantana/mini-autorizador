@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Desabilita CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/cartoes/**", "/transacoes/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(withDefaults()); // Usa configuração padrão para HTTP Basic
         return http.build();

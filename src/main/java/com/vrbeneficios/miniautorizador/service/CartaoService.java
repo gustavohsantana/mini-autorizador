@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class CartaoService {
@@ -31,5 +32,9 @@ public class CartaoService {
             return cartao;
         }
         return null;
+    }
+
+    public List<Cartao> getAllCartoes() {
+        return cartaoRepository.findAll();
     }
 }
