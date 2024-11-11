@@ -1,186 +1,190 @@
 
-# Mini Autorizador de Cartões 💳
+# Mini Autorizador
 
-Este projeto implementa um sistema simples de **Autorização de Transações de Cartões**, que permite criar cartões de crédito, consultar saldo, realizar transações e verificar se as operações são válidas com base no saldo e na senha do cartão.
+Este projeto é uma API que simula a funcionalidade de um sistema de autorização de cartões de crédito/débito. Foi desenvolvido utilizando Java 17, Spring Boot, Spring Security, Hibernate, Spring Data e MySQL. A seguir, apresento os detalhes da aplicação, como funciona, os endpoints disponíveis e exemplos de entradas e saídas.
 
-## Tecnologias Utilizadas 🚀
+## Tecnologias Utilizadas
 
-- **Java 17**: Utilizado como linguagem principal do projeto, garantindo compatibilidade com as versões mais recentes da plataforma e recursos de desempenho aprimorados.
-- **Spring Boot**: Framework utilizado para criar a API RESTful de forma rápida e eficiente.
-- **Spring Data JPA**: Usado para persistência de dados, facilitando a comunicação com o banco de dados relacional MySQL através de **Hibernate**.
-- **Spring Security**: Implementado para garantir segurança nas operações sensíveis, como autenticação e autorização de transações.
-- **MySQL**: Banco de dados relacional utilizado para armazenar os dados dos cartões e transações.
-- **Docker**: Utilizado para rodar o banco de dados MySQL em um container, facilitando a configuração e gerenciamento do banco de dados.
-- **Lombok**: Biblioteca para reduzir o boilerplate de código, especialmente em relação a getters, setters, e outros métodos repetitivos.
-- **Spring Boot Starter Web**: Para a criação de APIs RESTful com facilidade.
-- **Spring Boot Starter Validation**: Utilizado para validar as entradas do usuário, garantindo que as transações sejam realizadas de forma correta.
+- **Java 17**
+- **Spring Boot**
+- **Spring Security** (para validação de segurança)
+- **Spring Data JPA** (para integração com banco de dados)
+- **Hibernate** (para persistência de dados)
+- **MySQL** (para armazenamento de dados)
+- **Docker** (para containerização do MySQL)
 
-## Funcionalidades 💡
+## Endpoints da API
 
-- **Criação de Cartões**: Permite a criação de cartões de crédito com saldo inicial de R$ 500,00.
-- **Consulta de Saldo**: Consulta o saldo disponível de um cartão através de uma requisição GET.
-- **Listagem de Cartões**: Exibe todos os cartões cadastrados no sistema.
-- **Realização de Transações**: Efetua transações de débito em um cartão, validando o saldo e a senha fornecida.
+### 1. **Criar Cartão**
+- **Método**: POST
+- **URL**: `/cartoes/criar`
+- **Descrição**: Cria um novo cartão com saldo inicial de R$ 500,00.
 
-## Como Rodar 🏃‍♂️
-
-### Pré-requisitos 🔧
-
-1. **Java 17**: O projeto foi desenvolvido com a versão 17 do Java, portanto, é necessário ter o JDK 17 instalado.
-2. **Docker**: Para rodar o banco de dados MySQL em um container.
-
-### Passo a Passo 📜
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/miniautorizador.git
-   cd miniautorizador
-   ```
-
-2. **Rodar o Banco de Dados MySQL no Docker**:
-   Caso ainda não tenha o Docker instalado, siga as instruções [aqui](https://www.docker.com/get-started).
-   Rode o seguinte comando para levantar o MySQL em um container Docker:
-   ```bash
-   docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=cartao_db -p 3306:3306 -d mysql:latest
-   ```
-
-3. **Rodar o Aplicativo**:
-   Com o banco de dados em funcionamento, execute o projeto Spring Boot:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   Você também pode rodar o projeto diretamente da sua IDE (IntelliJ, Eclipse, etc.).
-
-4. **Acessar a API**:
-   A API estará disponível em `http://localhost:8080/cartoes`. Você pode utilizar ferramentas como Postman ou cURL para interagir com os endpoints.
-
-## Endpoints 📍
-
-### 1. **POST /cartoes/criar**
-Cria um novo cartão com saldo inicial de R$ 500,00.
-
-- **Exemplo de Entrada (Request Body)**:
-    ```json
-    {
-      "numeroCartao": "1234567890123456",
-      "senha": "1234"
-    }
-    ```
-
-- **Exemplo de Saída (Response)**:
-    ```json
-    {
-      "message": "Cartão criado com sucesso",
-      "numeroCartao": "1234567890123456",
-      "saldo": 500.00
-    }
-    ```
-
-- **Possíveis Erros**:
-    - **400 Bad Request**: Caso o número do cartão seja inválido ou a senha não seja fornecida.
-    - **409 Conflict**: Caso o cartão já exista.
-
+#### Entrada:
+```json
+{
+    "numeroCartao": "1234567890123456",
+    "senha": "1234"
+}
+```
+#### Saída Esperada:
+- **Código de Status**: 201 (Created)
+- **Corpo da Resposta**:
+```json
+{
+    "numeroCartao": "1234567890123456",
+    "senha": "1234",
+    "saldo": 500.00
+}
+```
+#### Print da Resposta:
+![img.png](img.png)
 ---
 
-### 2. **GET /cartoes/{numeroCartao}/saldo**
-Consulta o saldo de um cartão especificado pelo número.
+### 2. **Obter Saldo do Cartão**
+- **Método**: GET
+- **URL**: `/cartoes/{numeroCartao}/saldo`
+- **Descrição**: Retorna o saldo de um cartão específico.
 
-- **Exemplo de Entrada (Request)**:
-    - URL: `http://localhost:8080/cartoes/1234567890123456/saldo`
+#### Entrada:
+- **Número do Cartão**: `1234567890123456`
 
-- **Exemplo de Saída (Response)**:
-    ```json
-    {
-      "numeroCartao": "1234567890123456",
-      "saldo": 500.00
-    }
-    ```
-
-- **Possíveis Erros**:
-    - **404 Not Found**: Caso o cartão não seja encontrado.
-
+#### Saída Esperada:
+- **Código de Status**: 200 (OK)
+- **Corpo da Resposta**:
+```json
+500.00
+```
+#### Print da Resposta:
+![img_1.png](img_1.png)
 ---
 
-### 3. **GET /cartoes/listar**
-Lista todos os cartões cadastrados.
+### 3. **Listar Todos os Cartões**
+- **Método**: GET
+- **URL**: `/cartoes/listar`
+- **Descrição**: Retorna todos os cartões cadastrados no sistema.
 
-- **Exemplo de Entrada (Request)**:
-    - URL: `http://localhost:8080/cartoes/listar`
+#### Entrada: Nenhuma
 
-- **Exemplo de Saída (Response)**:
-    ```json
-    [
-      {
+#### Saída Esperada:
+- **Código de Status**: 200 (OK)
+- **Corpo da Resposta**:
+```json
+[
+    {
         "numeroCartao": "1234567890123456",
+        "senha": "1234",
         "saldo": 500.00
-      },
-      {
-        "numeroCartao": "9876543210123456",
-        "saldo": 300.00
-      }
-    ]
-    ```
+    },
+    {
+        "numeroCartao": "9876543210987654",
+        "senha": "4321",
+        "saldo": 1000.00
+    }
+]
+```
+#### Print da Resposta:
+![img_3.png](img_3.png)
+---
 
-- **Possíveis Erros**:
-    - **500 Internal Server Error**: Caso haja um erro no servidor.
+### 4. **Realizar Transação**
+- **Método**: POST
+- **URL**: `/cartoes/transacao`
+- **Descrição**: Realiza uma transação de débito no cartão especificado.
+
+#### Entrada:
+```json
+{
+    "numeroCartao": "1234567890123456",
+    "senhaCartao": "1234",
+    "valor": "100.00"
+}
+```
+
+#### Saída Esperada:
+- **Código de Status**: 200 (OK) - Caso a transação seja bem-sucedida
+- **Mensagem**:
+```json
+"Transação realizada com sucesso!"
+```
+
+#### Print da Resposta:
+![img_5.png](img_5.png)
+---
+
+## Validação de Segurança
+
+A aplicação utiliza **Spring Security** para proteger os endpoints, garantindo que apenas usuários autenticados possam realizar transações. A autenticação é feita por meio de **JWT (JSON Web Token)**.
+
+### Endpoint Protegido: **Realizar Transação**
+- **Método de Autenticação**: JWT (JSON Web Token)
+
+Para validar a segurança, o token JWT deve ser enviado no cabeçalho da requisição, como mostrado abaixo:
+
+#### Cabeçalho da Requisição:
+```bash
+Authorization: Bearer <seu-token-aqui>
+```
+
+#### Resposta para Acesso Negado (Token inválido ou ausente):
+- **Código de Status**: 401 (Unauthorized)
+- **Mensagem**:
+```json
+{
+    "error": "Token de autenticação inválido ou ausente."
+}
+```
+
+#### Print da Validação de Segurança:
+![img_4.png](img_4.png)
+---
+
+## Mapeamento de Erros
+
+A API possui as seguintes exceções mapeadas:
+
+### 1. **Cartão Não Encontrado**
+- **Código de Status**: 404 (Not Found)
+- **Mensagem de Erro**:
+```json
+{
+    "error": "Cartão não encontrado"
+}
+```
+
+### 2. **Senha Inválida**
+- **Código de Status**: 400 (Bad Request)
+- **Mensagem de Erro**:
+```json
+{
+    "error": "Senha inválida"
+}
+```
+
+### 3. **Saldo Insuficiente**
+- **Código de Status**: 400 (Bad Request)
+- **Mensagem de Erro**:
+```json
+{
+    "error": "Saldo insuficiente"
+}
+```
+
+### 4. **Erro Interno do Servidor**
+- **Código de Status**: 500 (Internal Server Error)
+- **Mensagem de Erro**:
+```json
+{
+    "error": "Erro interno do servidor"
+}
+```
+
+## Conclusão
+
+Essa API é um exemplo simples de como criar um sistema de autorização de transações com cartões, utilizando tecnologias como **Java 17**, **Spring Boot**, **Hibernate**, **Spring Data JPA** e **Spring Security**. Os endpoints estão protegidos por segurança e possuem validações robustas, garantindo que apenas usuários autorizados possam realizar transações.
+
+Por favor, consulte os prints das saídas de cada requisição e as validações de segurança para garantir que a aplicação esteja funcionando conforme o esperado.
 
 ---
 
-### 4. **POST /cartoes/transacao**
-Realiza uma transação de débito em um cartão, verificando o saldo e a senha.
-
-- **Exemplo de Entrada (Request Body)**:
-    ```json
-    {
-      "numeroCartao": "1234567890123456",
-      "senhaCartao": "1234",
-      "valor": 50.00
-    }
-    ```
-
-- **Exemplo de Saída (Response)**:
-    ```json
-    {
-      "message": "Transação realizada com sucesso",
-      "numeroCartao": "1234567890123456",
-      "novoSaldo": 450.00
-    }
-    ```
-
-- **Possíveis Erros**:
-    - **400 Bad Request**: Caso o valor da transação seja inválido ou a senha não seja fornecida.
-    - **404 Not Found**: Caso o cartão não seja encontrado.
-    - **403 Forbidden**: Caso a senha fornecida esteja incorreta.
-    - **400 Bad Request**: Caso o valor da transação seja superior ao saldo disponível.
-
-## Estrutura do Projeto 📂
-
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/
-│   │       └── vrbeneficios/
-│   │           └── miniautorizador/
-│   │               ├── controller/
-│   │               ├── dto/
-│   │               ├── exceptions/
-│   │               ├── model/
-│   │               ├── repository/
-│   │               ├── service/
-│   │               └── validator/
-│   └── resources/
-│       └── application.properties
-└── test/
-```
-
-## Exceções e Validações 🛠️
-
-- **Cartão Não Encontrado**: Caso o número do cartão não seja encontrado no banco de dados.
-- **Senha Inválida**: Caso a senha fornecida para o cartão esteja incorreta.
-- **Saldo Insuficiente**: Caso o valor da transação seja maior do que o saldo disponível no cartão.
-
-## Observações ⚠️
-
-- O sistema foi projetado para ser simples e focado na simulação de transações financeiras, sem a persistência do saldo entre reinicializações do sistema (exceto no ambiente real com MySQL).
-- A aplicação pode ser escalada com o uso de **Docker** para o banco de dados e outras tecnologias, dependendo da necessidade de produção.
+**Observação**: Certifique-se de adicionar as capturas de tela conforme os exemplos acima, para demonstrar as respostas e a segurança da aplicação.
