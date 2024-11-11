@@ -170,6 +170,7 @@ A API possui as seguintes exceções mapeadas:
     "error": "Cartão não encontrado"
 }
 ```
+![img_8.png](img_8.png)
 
 ### 2. **Senha Inválida**
 - **Código de Status**: 400 (Bad Request)
@@ -180,6 +181,8 @@ A API possui as seguintes exceções mapeadas:
 }
 ```
 
+![img_6.png](img_6.png)
+
 ### 3. **Saldo Insuficiente**
 - **Código de Status**: 400 (Bad Request)
 - **Mensagem de Erro**:
@@ -188,6 +191,8 @@ A API possui as seguintes exceções mapeadas:
     "error": "Saldo insuficiente"
 }
 ```
+![img_7.png](img_7.png)
+
 
 ### 4. **Erro Interno do Servidor**
 - **Código de Status**: 500 (Internal Server Error)
