@@ -2,8 +2,6 @@ package com.vrbeneficios.miniautorizador.service;
 
 import com.vrbeneficios.miniautorizador.dto.TransacaoRequest;
 import com.vrbeneficios.miniautorizador.exceptions.CartaoNaoEncontradoException;
-import com.vrbeneficios.miniautorizador.exceptions.SaldoInsuficienteException;
-import com.vrbeneficios.miniautorizador.exceptions.SenhaInvalidaException;
 import com.vrbeneficios.miniautorizador.model.Cartao;
 import com.vrbeneficios.miniautorizador.repository.CartaoRepository;
 import com.vrbeneficios.miniautorizador.validator.Validator;
