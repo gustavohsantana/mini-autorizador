@@ -46,7 +46,7 @@ class TransacaoServiceTest {
     }
 
     @Test
-    void deveRealizarTransacaoComSucesso() {
+    void realizarTransacaoComSucesso() {
         transacaoService.realizarTransacao(transacaoRequest);
 
         assertEquals(new BigDecimal("500.00"), cartao.getSaldo());
@@ -55,7 +55,7 @@ class TransacaoServiceTest {
     }
 
     @Test
-    void deveLancarExcecaoQuandoCartaoNaoEncontrado() {
+    void lancarExcecaoQuandoCartaoNaoEncontrado() {
         when(cartaoRepository.findById(cartao.getNumeroCartao())).thenReturn(java.util.Optional.empty());
 
         CartaoNaoEncontradoException exception = assertThrows(CartaoNaoEncontradoException.class, () -> {
@@ -67,7 +67,7 @@ class TransacaoServiceTest {
     }
 
     @Test
-    void deveLancarExcecaoQuandoSenhaInvalida() {
+    void lancarExcecaoQuandoSenhaInvalida() {
         transacaoRequest.setSenhaCartao("incorrect");
 
         SenhaInvalidaException exception = assertThrows(SenhaInvalidaException.class, () -> {
@@ -79,7 +79,7 @@ class TransacaoServiceTest {
     }
 
     @Test
-    void deveLancarExcecaoQuandoSaldoInsuficiente() {
+    void lancarExcecaoQuandoSaldoInsuficiente() {
         transacaoRequest.setValor("1500.00");
 
         SaldoInsuficienteException exception = assertThrows(SaldoInsuficienteException.class, () -> {
