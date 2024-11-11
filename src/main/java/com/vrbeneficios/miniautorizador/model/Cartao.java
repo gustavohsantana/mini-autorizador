@@ -5,6 +5,8 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -13,10 +15,10 @@ public class Cartao {
     @Id
     private String numeroCartao;
     private String senha;
-    private Double saldo;
+    private BigDecimal saldo;
 
     public Cartao() {
-        this.saldo = 500.00; // Saldo inicial de RS 500,00
+        this.saldo = BigDecimal.valueOf(500.00); // Saldo inicial de RS 500,00
     }
 
 }

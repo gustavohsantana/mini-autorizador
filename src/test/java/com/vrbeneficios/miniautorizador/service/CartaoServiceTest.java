@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -16,7 +18,7 @@ public class CartaoServiceTest {
 
     @Test
     public void testCriarCartao() {
-        Cartao cartao = new Cartao("123456789012", "senha123", 1000.0);
+        Cartao cartao = new Cartao("123456789012", "senha123", BigDecimal.valueOf(1000.0));
         Cartao novoCartao = cartaoService.criarCartao(cartao);
         assertNotNull(novoCartao);
         assertEquals(cartao.getNumeroCartao(), novoCartao.getNumeroCartao());
@@ -24,8 +26,8 @@ public class CartaoServiceTest {
 
     @Test
     public void testObterSaldoCartao() {
-        Cartao cartao = new Cartao("123456789012", "senha123", 1000.0);
-        Double saldoCartao = cartaoService.obterSaldo(cartao.getNumeroCartao());
+        Cartao cartao = new Cartao("123456789012", "senha123", BigDecimal.valueOf(1000.0));
+        BigDecimal saldoCartao = cartaoService.obterSaldo(cartao.getNumeroCartao());
         assertNotNull(saldoCartao);
         assertEquals(cartao.getSaldo(), saldoCartao);
     }

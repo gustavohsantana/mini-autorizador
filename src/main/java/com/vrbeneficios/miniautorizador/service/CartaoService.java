@@ -5,6 +5,8 @@ import com.vrbeneficios.miniautorizador.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class CartaoService {
 
@@ -15,10 +17,18 @@ public class CartaoService {
         return cartaoRepository.save(cartao);
     }
 
-    public Double obterSaldo(String numeroCartao) {
+    public BigDecimal obterSaldo(String numeroCartao) {
         Cartao cartao = cartaoRepository.findById(numeroCartao).orElse(null);
         if (cartao != null) {
             return cartao.getSaldo();
+        }
+        return null;
+    }
+
+    public Cartao obterCartao(String numeroCartao) {
+        Cartao cartao = cartaoRepository.findById(numeroCartao).orElse(null);
+        if (cartao != null) {
+            return cartao;
         }
         return null;
     }
