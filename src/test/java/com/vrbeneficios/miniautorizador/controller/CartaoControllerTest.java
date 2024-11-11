@@ -44,7 +44,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testCriarCartao_Sucesso() throws Exception {
+    public void testCriarCartaoSucesso() throws Exception {
         Cartao cartao = new Cartao("1234567890123456", "1234", new BigDecimal(1000));
 
         when(cartaoService.obterSaldo(cartao.getNumeroCartao())).thenReturn(null);
@@ -59,7 +59,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testCriarCartao_CartaoJaExiste() throws Exception {
+    public void testCriarCartaoCartaoJaExiste() throws Exception {
         Cartao cartao = new Cartao("1234567890123456", "1234", new BigDecimal(1000));
 
         when(cartaoService.obterSaldo(cartao.getNumeroCartao())).thenReturn(BigDecimal.TEN);
@@ -71,7 +71,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testObterSaldoCartao_Sucesso() throws Exception {
+    public void testObterSaldoCartaoSucesso() throws Exception {
         String numeroCartao = "1234567890123456";
         BigDecimal saldo = new BigDecimal(500);
 
@@ -83,7 +83,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testObterSaldoCartao_CartaoNaoEncontrado() throws Exception {
+    public void testObterSaldoCartaoCartaoNaoEncontrado() throws Exception {
         String numeroCartao = "1234567890123456";
 
         when(cartaoService.obterSaldo(numeroCartao)).thenReturn(null);
@@ -93,7 +93,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testRealizarTransacao_Sucesso() throws Exception {
+    public void testRealizarTransacaoSucesso() throws Exception {
         TransacaoRequest transacaoRequest = new TransacaoRequest("1234567890123456", "1234", "100");
 
         mockMvc.perform(post("/cartoes/transacao")
@@ -104,7 +104,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testRealizarTransacao_CartaoNaoEncontrado() throws Exception {
+    public void testRealizarTransacaoCartaoNaoEncontrado() throws Exception {
         TransacaoRequest transacaoRequest = new TransacaoRequest("1234567890123456", "1234", "100");
 
         doThrow(new CartaoNaoEncontradoException("Cartão não encontrado")).when(transacaoService).realizarTransacao(any(TransacaoRequest.class));
@@ -117,7 +117,7 @@ public class CartaoControllerTest {
     }
 
     @Test
-    public void testRealizarTransacao_SaldoInsuficiente() throws Exception {
+    public void testRealizarTransacaoSaldoInsuficiente() throws Exception {
         TransacaoRequest transacaoRequest = new TransacaoRequest("1234567890123456", "1234", "100");
 
         doThrow(new SaldoInsuficienteException("Saldo insuficiente")).when(transacaoService).realizarTransacao(any(TransacaoRequest.class));
