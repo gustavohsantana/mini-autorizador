@@ -12,8 +12,6 @@ import lombok.Setter;
 public class TransacaoRequest {
 
     private String numeroCartao;
-
     private String senhaCartao;
-
     private String valor;
 }

@@ -20,7 +20,6 @@ public class Cartao {
     private BigDecimal saldo;
 
     public Cartao() {
-        this.saldo = BigDecimal.valueOf(500.00); // Saldo inicial de RS 500,00
+        this.saldo = BigDecimal.valueOf(500.00); // Saldo inicial de R$ 500,00
     }
-
 }
